@@ -1,0 +1,6 @@
+# data directory
+data/**
+
+# unignore user to nym mapping data (matrix P)
+!data/P
+!data/P_gen_info.txt
