@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.sparse as sp
 import os.path
+import pathlib
 
 from myutils import msg
 
@@ -16,12 +17,14 @@ class DataReader:
 	items_file = data_dir + 'movies_big'
 	ratings_file = data_dir + 'ratings_big'
 
-	ratings_cache_file = data_dir + 'ratings.npz'
+	cache_dir = data_dir + "_cache/"
+	ratings_cache_file = cache_dir + 'ratings.npz'
+	nym_stats_cache_file = cache_dir + 'nym_stats.npy'
 
 	nyms_file = data_dir + 'P'
 	nym_count = 8 # number of nyms in 'data/P'
 	#########################
-	
+
 
 	def read_numpy_file(self, filename, dtype=np.float32):
 		""" Read from numpy file if it exists, otherwise from raw text file """
@@ -47,7 +50,8 @@ class DataReader:
 			f_items = self.read_numpy_file(self.items_file, dtype=int)
 			with msg('Forming rating matrix'):
 				ratings = sp.coo_matrix((f_ratings, (f_users, f_items)), dtype=np.float32).tocsc()
-			with msg('Saving rating matrix to "{}"'.format(filename)):
+			with msg(f'Saving rating matrix to "{filename}"'):
+				pathlib.Path(self.cache_dir).mkdir(parents=True, exist_ok=True) 
 				sp.save_npz(filename, ratings)
 		return ratings
 
@@ -61,3 +65,34 @@ class DataReader:
 			nyms_raw = np.loadtxt(f, delimiter=',', dtype=int)
 			# parse into list of nyms
 			return [ nyms_raw[:,0][nyms_raw[:,1]==nym_n] for nym_n in range(0, self.nym_count) ]
+	
+	@lru_cache(maxsize=1)
+	def get_nym_stats(self):
+		""" Returns statistics about rating distributions of all items for each nym,
+		as a 3d numpy array [nym number, item number, <stat>] (type np.float32),
+		where <stat> index
+		  0 : item index
+		  1 : distribution mean
+		  2 : distribution variance
+		  3 : number of ratings
+		Cached result to allow single load on multiple calls.
+		"""
+		filename = self.nym_stats_cache_file
+		if os.path.isfile(filename):
+			with msg(f'Reading nym stats from "{filename}"'):
+				stats = np.load(filename)
+		else:
+			ratings = self.get_ratings()
+			nyms = self.get_nyms()
+			stats = np.zeros((len(nyms), ratings.shape[1], 3), dtype=np.float32)
+			for nym_n, nym in enumerate(nyms):
+				with msg(f'Getting nym #{nym_n} stats'):
+					for i, items in enumerate(ratings[nyms[nym_n]].T):
+						data = items.data
+						stats[nym_n, i, 0] = data.var() if len(data) > 0 else 0
+						stats[nym_n, i, 1] = len(data)
+						stats[nym_n, i, 2] = i
+			with msg(f'Saving nym stats to "{filename}"'):
+				pathlib.Path(self.cache_dir).mkdir(parents=True, exist_ok=True) 
+				np.save(filename, stats)
+		return stats
