@@ -18,15 +18,15 @@ Run `./setup.sh`
 Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution. Only bubbles with at least the threshold number of ratings are plotted.
 ```
 optional arguments:
-  -h, --help         show this help message and exit
-  --thresh THRESH    only plot distributions with at least thresh number of
-                     ratings (defualt 50)
-  --inverse          plot inverse variance instead of variance
-  --savefig          save the figure to file rather than displaying the figure
-  --outfile OUTFILE  file to save the figure to (default
-                     "figures/variances.png")
-  --rmin RMIN        Lowest index of item to display
-  --rmax RMAX        Highest index of item to display (inclusive)
+  -h, --help        show this help message and exit
+  -b                index of the item to begin plotting from
+  -n                number of items to plot
+  -t                only plot distributions with at least threshold number of
+                    ratings (defualt 50)
+  -i                plot inverse variance instead of variance
+  --savefig         save the figure to file rather than displaying the figure
+  -outfile          file to save the figure to (default
+                    "figures/variances.png")
  ```
 
 ### `datareader.py`
