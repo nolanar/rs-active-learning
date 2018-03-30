@@ -1,7 +1,9 @@
 # Active Learning for Recommender Systems
 
 ## Setup 
-Run `./setup.sh` to install required python libraries.
+Run `./setup.sh`
+* installs required python libraries
+* creates empty directories
 
 ## Scripts
 

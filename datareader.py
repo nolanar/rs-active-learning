@@ -52,7 +52,6 @@ class DataReader:
 			with msg('Forming rating matrix'):
 				ratings = sp.coo_matrix((f_ratings, (f_users, f_items)), dtype=np.float32).tocsc()
 			with msg(f'Saving rating matrix to "{filename}"'):
-				pathlib.Path(DataReader.cache_dir).mkdir(parents=True, exist_ok=True) 
 				sp.save_npz(filename, ratings)
 		return ratings
 
@@ -94,6 +93,5 @@ class DataReader:
 						stats[nym_n, i, 1] = len(data)
 						stats[nym_n, i, 2] = i
 			with msg(f'Saving nym stats to "{filename}"'):
-				pathlib.Path(DataReader.cache_dir).mkdir(parents=True, exist_ok=True) 
 				np.save(filename, stats)
 		return stats
