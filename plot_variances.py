@@ -9,7 +9,7 @@ from myutils import msg
 thresh_default = 50
 outfile_default = Data.figure_dir + "variances.png"
 
-parser = argparse.ArgumentParser(description="plot vairance of each group by item number")
+parser = argparse.ArgumentParser(description="Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution.")
 parser.add_argument("--thresh", help=f"only plot distributions with at least thresh number of ratings (defualt {thresh_default})", default=thresh_default, type=int)
 parser.add_argument("--inverse", help="plot inverse variance instead of variance", action="store_true")
 parser.add_argument("--savefig", help="save the figure to file rather than displaying the figure", action="store_true")

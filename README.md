@@ -12,7 +12,7 @@ Run `./setup.sh`
 ## Scripts
 
 ### `plot_variances.py`
-Plot variance of each group by item number
+Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution.
 ```
 optional arguments:
   -h, --help         show this help message and exit
