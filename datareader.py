@@ -84,14 +84,15 @@ class DataReader:
 		else:
 			ratings = DataReader.get_ratings()
 			nyms = DataReader.get_nyms()
-			stats = np.zeros((len(nyms), ratings.shape[1], 3), dtype=np.float32)
+			stats = np.zeros((len(nyms), ratings.shape[1], 4), dtype=np.float32)
 			for nym_n, nym in enumerate(nyms):
 				with msg(f'Getting nym #{nym_n} stats'):
-					for i, items in enumerate(ratings[nyms[nym_n]].T):
+					for i, items in enumerate(ratings[nym].T):
 						data = items.data
-						stats[nym_n, i, 0] = data.var() if len(data) > 0 else 0
-						stats[nym_n, i, 1] = len(data)
-						stats[nym_n, i, 2] = i
+						stats[nym_n, i, 0] = i
+						stats[nym_n, i, 1] = data.mean() if len(data) > 0 else 0
+						stats[nym_n, i, 2] = data.var() if len(data) > 0 else 0
+						stats[nym_n, i, 3] = len(data)
 			with msg(f'Saving nym stats to "{filename}"'):
 				np.save(filename, stats)
 		return stats
