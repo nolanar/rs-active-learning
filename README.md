@@ -2,6 +2,9 @@
 
 Active Learning for Recommender Systems via Group Learning
 
+## Requirements
+* Python 3.6+
+
 ## Setup 
 
 Run `./setup.sh`
