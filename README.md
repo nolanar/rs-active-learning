@@ -15,7 +15,7 @@ Run `./setup.sh`
 ## Scripts
 
 ### `plot_variances.py`
-Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution.
+Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution. Only bubbles with at least the threshold number of ratings are plotted.
 ```
 optional arguments:
   -h, --help         show this help message and exit
