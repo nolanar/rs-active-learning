@@ -23,7 +23,7 @@ def plot_variances(thresh=thresh_default, inv=False, savefig=False, outfile=outf
 	fig, ax = plt.subplots()
 	ax.set(
 		# ylim=(0, None),
-		title=f'vairance of each group by item number (thresh no. ratings >= {thresh})',
+		title=f'variance of each group by item number (thresh no. ratings >= {thresh})',
 		xlabel='item number',
 		ylabel=inv_msg)
 	
