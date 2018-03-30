@@ -1,12 +1,11 @@
 # data directory
 data/**
 
+# unignore compressed nyms and ratings data
+!data/data.zip
+
 # figures directory
 figures/
-
-# unignore user to nym mapping data (matrix P)
-!data/P
-!data/P_gen_info.txt
 
 # python specific
 __pycache__/

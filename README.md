@@ -1,14 +1,18 @@
 # Active Learning for Recommender Systems
 
+Active Learning for Recommender Systems via Group Learning
+
 ## Setup 
+
 Run `./setup.sh`
 * installs required python libraries
 * creates empty directories
+* unzips data
 
 ## Scripts
 
 ### `plot_variances.py`
-Plot vairance of each group by item number
+Plot variance of each group by item number
 ```
 optional arguments:
   -h, --help         show this help message and exit
