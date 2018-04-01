@@ -12,8 +12,8 @@ class DataReader:
 	
 	######## CONFIG #########
 	# blc_data = '2018-03-29T13:05:37' # features: 10, nyms: 8
-	blc_data = '2018-04-01T12:49:15' # features: 20, nyms: 16
-	# blc_data = '2018-04-01T13:39:42' # features: 20, nyms: 8
+	# blc_data = '2018-04-01T12:49:15' # features: 20, nyms: 16
+	blc_data = '2018-04-01T13:39:42' # features: 20, nyms: 8
 
 	data_dir = "data/"
 	figure_dir = "figures/"

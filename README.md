@@ -14,19 +14,20 @@ Run `./setup.sh`
 
 ## Scripts
 
-### `plot_variances.py`
-Plot variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution. Only bubbles with at least the threshold number of ratings are plotted.
+### `plot_nym_stat.py`
+Plot mean or variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution. Only bubbles with at least the threshold number of ratings are plotted.
 ```
 optional arguments:
-  -h, --help        show this help message and exit
-  -b                index of the item to begin plotting from
-  -n                number of items to plot
-  -t                only plot distributions with at least threshold number of
-                    ratings (defualt 50)
-  -i                plot inverse variance instead of variance
-  --savefig         save the figure to file rather than displaying the figure
-  -outfile          file to save the figure to (default
-                    "figures/variances.png")
+  -h, --help         show this help message and exit
+  -o                 1 to plot mean, 2 to plot variance, (default 2)
+  -b                 index of the item to begin plotting from
+  -n                 number of items to plot
+  -t                 only plot distributions with at least threshold number of
+                     ratings (defualt 50)
+  -i                 plot inverse of chosen stat instead
+  --savefig          save the figure to file rather than displaying the figure
+  --outfile          file to save the figure to (default
+                     "figures/nym_stat.png")
  ```
 
 ### `datareader.py`
