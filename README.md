@@ -30,4 +30,6 @@ optional arguments:
  ```
 
 ### `datareader.py`
-Contains a utility class for getting rating and nym data.
+Contains a utility class for getting rating and nym data. 
+
+Change the uncommented `blc_data` at the top of the config section to select which BLC generated data (nyms, V, Utilde etc.) is used.

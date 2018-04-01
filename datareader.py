@@ -11,6 +11,10 @@ class DataReader:
 	""" Utility class for getting rating and nym data """
 	
 	######## CONFIG #########
+	# blc_data = '2018-03-29T13:05:37' # features: 10, nyms: 8
+	blc_data = '2018-04-01T12:49:15' # features: 20, nyms: 16
+	# blc_data = '2018-04-01T13:39:42' # features: 20, nyms: 8
+
 	data_dir = "data/"
 	figure_dir = "figures/"
 
@@ -20,10 +24,9 @@ class DataReader:
 
 	cache_dir = data_dir + "_cache/"
 	ratings_cache_file = cache_dir + 'ratings.npz'
-	nym_stats_cache_file = cache_dir + 'nym_stats.npy'
+	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats.npy'
 
-	nyms_file = data_dir + 'P'
-	nym_count = 8 # number of nyms in 'data/P'
+	nyms_file = data_dir + blc_data + '/P'
 	#########################
 
 
@@ -64,8 +67,12 @@ class DataReader:
 		with msg(f'Reading nyms from "{filename}"'), open(filename, 'r') as f: 
 			nyms_raw = np.loadtxt(f, delimiter=',', dtype=int)
 			# parse into list of nyms
-			return [ nyms_raw[:,0][nyms_raw[:,1]==nym_n] for nym_n in range(0, DataReader.nym_count) ]
+			nym_count = nyms_raw[:,1].max() + 1
+			return [ nyms_raw[:,0][nyms_raw[:,1]==nym_n] for nym_n in range(0, nym_count) ]
 	
+	def nym_count():
+		return len(DataReader.get_nyms())
+
 	@lru_cache(maxsize=1)
 	def get_nym_stats():
 		""" Returns statistics about rating distributions of all items for each nym,

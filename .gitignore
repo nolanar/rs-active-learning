@@ -1,8 +1,8 @@
-# data directory
-data/**
-
-# unignore compressed nyms and ratings data
-!data/data.zip
+# unziped ratings and cache
+data/ratings_big.txt
+data/movies_big.txt
+data/users_big.txt
+data/_cache
 
 # figures directory
 figures/

@@ -28,13 +28,13 @@ def plot_variances(thresh=thresh_default, inv=False, savefig=False, outfile=outf
 		ylabel=inv_msg)
 	
 	cm = plt.get_cmap('gist_rainbow')
-	colors = [cm(1.*i/Data.nym_count) for i in range(Data.nym_count)]
+	colors = [cm(1.*i/Data.nym_count()) for i in range(Data.nym_count())]
 
 	begin = 0 if begin is None else begin
 	end = None if num is None else begin + num 
 	nym_stats = Data.get_nym_stats()[:, begin : (None if num is None else begin+num),:]
 
-	for nym_n in range(Data.nym_count):
+	for nym_n in range(Data.nym_count()):
 		nym_n_stats = nym_stats[nym_n]
 		with msg(f'plotting nym #{nym_n} {inv_msg}'):
 
