@@ -23,8 +23,8 @@ class DataReader:
 	ratings_file = data_dir + 'ratings_big'
 
 	cache_dir = data_dir + "_cache/"
-	ratings_cache_file = cache_dir + 'ratings.npz'
-	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats.npy'
+	ratings_cache_file = cache_dir + 'ratings_v2.npz'
+	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
 
 	nyms_file = data_dir + blc_data + '/P'
 	#########################
@@ -53,10 +53,30 @@ class DataReader:
 			f_users = DataReader.read_numpy_file(DataReader.users_file, dtype=int)
 			f_items = DataReader.read_numpy_file(DataReader.items_file, dtype=int)
 			with msg('Forming rating matrix'):
-				ratings = sp.coo_matrix((f_ratings, (f_users, f_items)), dtype=np.float32).tocsc()
+				ratings = sp.coo_matrix((f_ratings, (f_users, f_items)), dtype=np.float32)
+				ratings = DataReader.prepare_R(ratings)
 			with msg(f'Saving rating matrix to "{filename}"'):
 				sp.save_npz(filename, ratings)
 		return ratings
+
+	def prepare_R(R, verbose=1):
+		columns = np.asarray(R.sum(0)>0).flatten()
+		if (R.sum(0)==0).sum() > 0:
+			if verbose: print("Removing columns...", end="")
+			R = R.tocsc()
+			columns = np.asarray(R.sum(0)>0).flatten()
+			R = R[:, columns]
+
+		# Remove empty rows (users)
+		R = sp.csc_matrix(R) # Convert to sparse column matrix
+		rows = np.asarray(R.sum(1)>0).flatten()
+		if (R.sum(1)==0).sum() > 0:
+			if verbose: print("Removing rows...", end="")
+			R = R[rows,:]
+
+		R.eliminate_zeros()
+		R.sort_indices()
+		return R
 
 	@lru_cache(maxsize=1)
 	def get_nyms():
