@@ -30,6 +30,18 @@ optional arguments:
                      "figures/nym_stat.png")
  ```
 
+### `plot_item_dist.py`
+Plot of the group distributions for an item. Bar plots are used by default.
+```
+positional arguments:
+  item        number of item to plot
+
+optional arguments:
+  -h, --help  show this help message and exit
+  --heat      plot as 2D heatmap
+  --kde       plot as kernel density estimates
+```
+
 ### `datareader.py`
 Contains a utility class for getting rating and nym data. 
 
