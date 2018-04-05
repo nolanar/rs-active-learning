@@ -37,6 +37,7 @@ positional arguments:
 optional arguments:
   -h, --help  show this help message and exit
   -g G        group number to plot (all by default)
+  -a          plot all ratings together ignoring groups
   --heat      plot as 2D heatmap (defualt histogram)
 ```
 
