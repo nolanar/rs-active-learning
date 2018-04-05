@@ -11,19 +11,15 @@ class DataReader:
 	""" Utility class for getting rating and nym data """
 	
 	######## CONFIG #########
-	# blc_data = '2018-03-29T13:05:37' # features: 10, nyms: 8
-	# blc_data = '2018-04-01T12:49:15' # features: 20, nyms: 16
-	blc_data = '2018-04-01T13:39:42' # features: 20, nyms: 8
+	# netflix data
+	blc_data = '2018-04-03T18:40:29' # features: 20, nyms: 8
 
 	data_dir = "data/"
 	figure_dir = "figures/"
 
-	users_file = data_dir + 'users_big'
-	items_file = data_dir + 'movies_big'
-	ratings_file = data_dir + 'ratings_big'
+	ratings_file = data_dir + 'netflix_ratings.npz'
 
 	cache_dir = data_dir + "_cache/"
-	ratings_cache_file = cache_dir + 'ratings_v2.npz'
 	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
 
 	nyms_file = data_dir + blc_data + '/P'
@@ -44,39 +40,12 @@ class DataReader:
 		Stores csc matrix to ratings_cache_file for faster loading in future.
 		Cached result to allow single load on multiple calls. 
 		"""
-		filename = DataReader.ratings_cache_file
+		filename = DataReader.ratings_file
 		if os.path.isfile(filename):
 			with msg(f'Loading rating matrix from "{filename}"'):
-				ratings = sp.load_npz(filename)
+				return sp.load_npz(filename)
 		else:
-			f_ratings = DataReader.read_numpy_file(DataReader.ratings_file)
-			f_users = DataReader.read_numpy_file(DataReader.users_file, dtype=int)
-			f_items = DataReader.read_numpy_file(DataReader.items_file, dtype=int)
-			with msg('Forming rating matrix'):
-				ratings = sp.coo_matrix((f_ratings, (f_users, f_items)), dtype=np.float32)
-				ratings = DataReader.prepare_R(ratings)
-			with msg(f'Saving rating matrix to "{filename}"'):
-				sp.save_npz(filename, ratings)
-		return ratings
-
-	def prepare_R(R, verbose=1):
-		columns = np.asarray(R.sum(0)>0).flatten()
-		if (R.sum(0)==0).sum() > 0:
-			if verbose: print("Removing columns...", end="")
-			R = R.tocsc()
-			columns = np.asarray(R.sum(0)>0).flatten()
-			R = R[:, columns]
-
-		# Remove empty rows (users)
-		R = sp.csc_matrix(R) # Convert to sparse column matrix
-		rows = np.asarray(R.sum(1)>0).flatten()
-		if (R.sum(1)==0).sum() > 0:
-			if verbose: print("Removing rows...", end="")
-			R = R[rows,:]
-
-		R.eliminate_zeros()
-		R.sort_indices()
-		return R
+			raise RuntimeError(f'"{filename}" does not exist. Use "netflix_data.py" to generate it.')
 
 	@lru_cache(maxsize=1)
 	def get_nyms():

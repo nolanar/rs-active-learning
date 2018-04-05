@@ -1,7 +1,9 @@
 # unziped ratings and cache
-data/ratings_big.txt
-data/movies_big.txt
-data/users_big.txt
+data/netflix-prize-data.zip
+data/netflix_orig_movie_ids.npy
+data/netflix_orig_user_ids.npy
+data/netflix_ratings.npz
+
 data/_cache
 
 # figures directory

@@ -7,10 +7,8 @@ Active Learning for Recommender Systems via Group Learning
 
 ## Setup 
 
-Run `./setup.sh`
-* installs required python libraries
-* creates empty directories
-* unzips data
+1. Download the Netflix Prize data zip file from <https://www.kaggle.com/netflix-inc/netflix-prize-dat>, putting the zip file into the `data/` directory
+2. Run `./setup.sh` from the project root directory
 
 ## Scripts
 
