@@ -29,15 +29,15 @@ optional arguments:
  ```
 
 ### `plot_item_dist.py`
-Plot of the group distributions for an item. Bar plots are used by default.
+Plot of the group distributions for an item.
 ```
 positional arguments:
   item        number of item to plot
 
 optional arguments:
   -h, --help  show this help message and exit
-  --heat      plot as 2D heatmap
-  --kde       plot as kernel density estimates
+  -g G        group number to plot (all by default)
+  --heat      plot as 2D heatmap (defualt histogram)
 ```
 
 ### `datareader.py`
