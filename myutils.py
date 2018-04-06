@@ -7,9 +7,9 @@ newl = False
 def msg(message):
 	global nesting_level, newl
 
-	indent = '  ' * nesting_level
+	indent = '  '
 	nl = '\n' if newl else ''
-	output = f'{nl}{indent}{message} ... '
+	output = f'{nl}{indent * nesting_level}{message} ... '
 	print(output, end='', flush=True)
 	nesting_level += 1
 	newl = True
@@ -18,6 +18,6 @@ def msg(message):
 	yield
 	t1 = default_timer()
 	
-	print('{}done ({:.3f}s)'.format('' if newl else indent, t1-t0))
+	print('{}done ({:.3f}s)'.format('' if newl else indent * (nesting_level), t1-t0))
 	nesting_level -= 1
 	newl = False
