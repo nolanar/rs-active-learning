@@ -26,6 +26,7 @@ class DataReader:
 	V_file = data_dir + blc_data + '/V'
 	Utilde_file = data_dir + blc_data + '/Utilde'
 	lam_file = data_dir + blc_data + '/lam'
+	Rvar_file = data_dir + blc_data + '/Rvar'
 	#########################
 
 
