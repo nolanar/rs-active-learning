@@ -23,7 +23,7 @@ def barplot_rating_dist(item, single=False, group=None, savefig=None):
 		plt.ylabel('no. ratings')
 		step = 1
 		bins = np.arange(step/2, 5 + 1.5*step, step)
-		hist = lambda d, **kwargs: plt.hist(d, bins=bins, **kwargs)
+		hist = lambda d, **kwargs: plt.hist(d, bins=bins, rwidth=step*0.75, **kwargs)
 		if group is not None: 
 			plt.title(f'Item {item}, group {group} rating distribution')
 			hist(ratings[nyms[group]].data)
