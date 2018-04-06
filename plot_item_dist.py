@@ -13,26 +13,34 @@ parser.add_argument('-g', help='group number to plot (all by default)', default=
 parser.add_argument('-a', help='plot all ratings together ignoring groups', action="store_true")
 parser.add_argument('--heat', help='plot as 2D heatmap (defualt histogram)', action="store_true")
 
-def distplot(d, **kwargs):
-	step = 1
-	bins = np.arange(step/2, 5 + 1.5*step, step)
-	sns.distplot(d, bins=bins, kde=False, hist_kws={"linewidth": 0, "alpha": 1}, **kwargs)
-
-def barplot_rating_dist(item, kde=False, single=False, group=None):
+def barplot_rating_dist(item, single=False, group=None, savefig=None):
 
 	with msg("plotting rating distribution"):
 		ratings = Data.get_ratings()[:,item]
 		nyms = Data.get_nyms()
 
+		plt.xlabel('rating')
+		plt.ylabel('no. ratings')
+		step = 1
+		bins = np.arange(step/2, 5 + 1.5*step, step)
+		hist = lambda d, **kwargs: plt.hist(d, bins=bins, **kwargs)
 		if group is not None: 
-			distplot(ratings[nyms[group]].data, label=f'group {group}')
+			plt.title(f'Item {item}, group {group} rating distribution')
+			hist(ratings[nyms[group]].data)
 		elif single: 
-			distplot(ratings.data, label=f'all item #{item} ratings')
+			plt.title(f'Item {item} rating distribution')
+			hist(ratings.data)
 		else:
+			plt.title(f'Item {item}, all groups rating distributions')
 			for nym_n, nym in enumerate(nyms):
-				distplot(ratings[nym].data, label=f'group {nym_n}')
-		plt.legend()
-		plt.show()
+				hist(ratings[nym].data, histtype='step', linewidth=2 ,label=f'group {nym_n}')
+			plt.legend()
+		if savefig is None:
+			plt.show()
+		else:
+			with msg(f'Saving figure to "{savefig}"'):
+				plt.savefig(savefig, dpi=150)
+			plt.clf()
 
 def heatmap_rating_dist(item):
 	# def plot_rating_dists_across_groups(ratings, item, groups, savefig=False):
