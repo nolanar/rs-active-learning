@@ -23,6 +23,8 @@ class DataReader:
 	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
 
 	nyms_file = data_dir + blc_data + '/P'
+	V_file = data_dir + blc_data + '/V'
+	Utilde_file = data_dir + blc_data + '/Utilde'
 	#########################
 
 
@@ -92,3 +94,13 @@ class DataReader:
 			with msg(f'Saving nym stats to "{filename}"'):
 				np.save(filename, stats)
 		return stats
+
+	@lru_cache(maxsize=1)
+	def get_Rtilde():
+		V = DataReader.read_numpy_file(DataReader.V_file)
+		Utilde = DataReader.read_numpy_file(DataReader.Utilde_file)
+		return np.dot(Utilde.T, V)
+
+	@lru_cache(maxsize=1)
+	def get_Rvar():
+		return DataReader.read_numpy_file(DataReader.Rvar_file)
