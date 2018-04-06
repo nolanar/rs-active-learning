@@ -25,6 +25,7 @@ class DataReader:
 	nyms_file = data_dir + blc_data + '/P'
 	V_file = data_dir + blc_data + '/V'
 	Utilde_file = data_dir + blc_data + '/Utilde'
+	lam_file = data_dir + blc_data + '/lam'
 	#########################
 
 
@@ -104,3 +105,8 @@ class DataReader:
 	@lru_cache(maxsize=1)
 	def get_Rvar():
 		return DataReader.read_numpy_file(DataReader.Rvar_file)
+
+	@lru_cache(maxsize=1)
+	def get_lam():
+		""" number of ratings for each item by each group """
+		return DataReader.read_numpy_file(DataReader.lam_file)
