@@ -7,12 +7,12 @@ from datareader import DataReader as Data
 from myutils import msg
 
 thresh_default = 50
-stat_options = [1, 2] # 1 for mean, 2 for variance
+stat_options = {1: 'mean', 2: 'variance', 3:'stddev'}
 stat_option_default = 2
 outfile_default = Data.figure_dir + "nym_stat_plot.png"
 
 parser = argparse.ArgumentParser(description="Plot the mean or variance of each group by item number. The size of each bubble corresponds to the square root of the number of ratings for that distribution. Only bubbles with at least the threshold number of ratings are plotted.")
-parser.add_argument("-o", help=f"1 to plot mean, 2 to plot variance, (default {stat_option_default})", type=int, default=stat_option_default)
+parser.add_argument("-o", help=f"1 to plot mean, 2 to plot variance, 3 to plot stddev (default {stat_option_default})", type=int, default=stat_option_default)
 parser.add_argument("-b", help="index of the item to begin plotting from", default=None, type=int)
 parser.add_argument("-n", help="number of items to plot", default=None, type=int)
 parser.add_argument("-t", help=f"only plot distributions with at least threshold number of ratings (defualt {thresh_default})", default=thresh_default, type=int)
@@ -21,7 +21,7 @@ parser.add_argument("--savefig", help="save the figure to file rather than displ
 parser.add_argument("--outfile", help=f'file to save the figure to (default "{outfile_default}")', default=outfile_default)
 
 def plot_nym_stat(thresh=thresh_default, inv=False, savefig=False, outfile=outfile_default, begin=None, num=None, stat_option=stat_option_default):
-	stat_name = {1: 'mean', 2: 'variance'}[stat_option]
+	stat_name = stat_options[stat_option]
 	if inv: stat_name = f'inverse {stat_name}'
 	
 	fig, ax = plt.subplots()
@@ -46,7 +46,13 @@ def plot_nym_stat(thresh=thresh_default, inv=False, savefig=False, outfile=outfi
 			print(f'{valids.sum()} of {len(valids)} valid (thresh = {thresh})')
 
 			x = nym_n_stats[:,0][valids]
-			y = nym_n_stats[:,stat_option][valids]
+			if stat_option is 1:
+				y = nym_n_stats[:,1][valids]
+			elif stat_option is 2:
+				y = nym_n_stats[:,2][valids]
+			elif stat_option is 3:
+				y = np.sqrt(nym_n_stats[:,2][valids])
+
 			if inv: y[y > 0] = 1 / y[y > 0]
 			s = np.sqrt(nym_n_stats[:,3][valids])
 
@@ -62,5 +68,5 @@ def plot_nym_stat(thresh=thresh_default, inv=False, savefig=False, outfile=outfi
 
 if __name__ == "__main__":
 	args = parser.parse_args()
-	stat_option = args.o if args.o in stat_options else stat_option_default
+	stat_option = args.o if args.o in stat_options.keys() else stat_option_default
 	plot_nym_stat(args.t, args.i, args.savefig, args.outfile, args.b, args.n, stat_option)
