@@ -11,11 +11,14 @@ class UserGroupModel:
 		self.dist_model = dist_model
 
 	def expected_utility(self, items, util_f):
-		probs = self.dist_model[:, items, :] # [p x q x r_bar] matrix
+		cond_probs = self.dist_model[:, items, :] # [p x q x r_bar] matrix
 
-		# Get the product of all perms of ratings as a [(r_bar ^ q) x p] matrix
-		# i.e. get the P(R_u1 = r_1, ..., R_uq = r_q | G_u = g; \pi)'s, with g as column
-		cond_probs = np.array(list(map(partial(reduce, np.outer), probs))).reshape(self.g, -1).T
+		# get the P(R_u1 = r_1, ..., R_uq = r_q | G_u = g; \pi)'s as the product 
+		# of P(R_ui = r_i | G_u = g; \pi)'s, for all permutations of ratings
+		if len(items) > 1: cond_probs = np.array(list(map(partial(reduce, np.outer), cond_probs)))
+
+		# flatten the item and ratings dimensions
+		cond_probs = cond_probs.reshape(self.g, -1).T
 
 		# marginalise out groups to get P(R_u1 = r_1, ..., R_uq = r_q; \pi)'s
 		r_probs = cond_probs.dot(self.g_probs)
