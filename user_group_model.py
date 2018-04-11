@@ -28,22 +28,35 @@ class UserGroupModel:
 
 class TestUserGroupModel(unittest.TestCase):
 
-	def test_probs_sum_to_one_when_U_is_ident(self):
+	def __init__(self, *args, **kwargs):
+		super(TestUserGroupModel, self).__init__(*args, **kwargs)
 		np.random.seed(1)
 
-		group_count, item_count, rating_count = 8, 10, 5
+	def get_test_dist_model(self, group_count=8, item_count=10, rating_count=5):
 		dist_m = np.random.randint(8, size=(group_count, item_count, rating_count)).astype(np.float32) + 1
 		dist_m /= dist_m.sum(axis=2, keepdims=True) # normalise rating dists
+		return dist_m
 
+	def get_test_user_model(self, dist_model, group_count=8):
 		init_probs = np.arange(group_count, dtype=np.float32) + 1
 		init_probs /= init_probs.sum()
-		user_m = UserGroupModel(init_probs, dist_m)
+		user_m = UserGroupModel(init_probs, dist_model)
+		return user_m
 
-		items = [0, 2, 5]
+	def check_probs_sum_to_one_when_U_is_ident(self, items):
+		dist_m = self.get_test_dist_model()
+		user_m = self.get_test_user_model(dist_m)
+
 		U = lambda x: x
 		exp_u = user_m.expected_utility(items, U)
-		
+
 		self.assertAlmostEqual(exp_u.sum(), 1.0)
+
+	def test_probs_sum_to_one_when_U_is_ident_with_one_item(self):
+		self.check_probs_sum_to_one_when_U_is_ident([2])
 	
+	def test_probs_sum_to_one_when_U_is_ident_with_several_items(self):
+		self.check_probs_sum_to_one_when_U_is_ident([0, 3, 5])
+
 if __name__ == '__main__':
     unittest.main()
