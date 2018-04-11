@@ -126,6 +126,12 @@ class DataReader:
 
 	@lru_cache(maxsize=1)
 	def get_group_rating_distributions():
+		"""
+		Returns a [p, m, r] array containing distribution of ratings for each item by group
+		p = number of groups
+		m = number of items
+		r = rating
+		"""
 		cachefile = DataReader.group_rating_dists_cache_file
 		if os.path.isfile(cachefile):
 			with msg(f'Reading distribution of ratings for each item per group from "{cachefile}"'):
