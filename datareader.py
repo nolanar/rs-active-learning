@@ -30,7 +30,7 @@ class DataReader:
 	Utilde_file = data_dir + blc_data + '/Utilde'
 	lam_file = data_dir + blc_data + '/lam'
 	Rvar_file = data_dir + blc_data + '/Rvar'
-	P_file = data_dir + blc_data + '/P.npz' # P as scipy csr matrix
+	P_file = data_dir + blc_data + '/P'
 	#########################
 
 
@@ -60,12 +60,10 @@ class DataReader:
 		""" Returns the nyms as a list of numpy arrays.
 		Cached result to allow single load on multiple calls.
 		"""
-		filename = DataReader.nyms_file
-		with msg(f'Reading nyms from "{filename}"'), open(filename, 'r') as f: 
-			nyms_raw = np.loadtxt(f, delimiter=',', dtype=int)
-			# parse into list of nyms
-			nym_count = nyms_raw[:,1].max() + 1
-			return [ nyms_raw[:,0][nyms_raw[:,1]==nym_n] for nym_n in range(0, nym_count) ]
+		P = DataReader.get_P()
+		with msg(f'Converting to list of user indexes by group'):
+			indexes = np.arange(P.shape[1])
+			return [indexes[group] for group in P.astype(bool)]
 	
 	def nym_count():
 		return len(DataReader.get_nyms())
@@ -119,8 +117,12 @@ class DataReader:
 	@lru_cache(maxsize=1)
 	def get_P():
 		filename = DataReader.P_file
-		with msg(f'Reading "{filename}"'):
-			return sp.load_npz(filename)
+		if os.path.isfile(filename + '.npz'):
+			with msg(f'Reading "{filename}.npz"'):
+				return sp.load_npz(filename + '.npz').toarray()
+		elif os.path.isfile(filename + '.npy'):
+			with msg(f'Reading "{filename}.npy"'):
+				return sp.load(filename + '.npy')
 
 	@lru_cache(maxsize=1)
 	def get_group_rating_distributions():
