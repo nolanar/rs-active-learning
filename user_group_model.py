@@ -1,44 +1,49 @@
 import numpy as np
 from functools import reduce, partial
 
+import unittest
+
 class UserGroupModel:
 
 	def __init__(self, init_probs, dist_model):
-		self.groups = np.arange(len(init_probs))
-		self.group_probs = init_probs
+		self.g = init_probs.shape[0] # number of groups
+		self.g_probs = init_probs
 		self.dist_model = dist_model
 
-	def lookahead(self, items):
-		probs = self.dist_model[:, items, :] # p x q x r_bar matrix
+	def expected_utility(self, items, util_f):
+		probs = self.dist_model[:, items, :] # [p x q x r_bar] matrix
 
-		# Get the product of all perms of ratings as an ndarray
-		# i.e. P(R_u1 = r_1, ..., R_uq = r_q | G_u = g; \pi)'s
-		prob_r_g = np.array(list(map(partial(reduce, np.outer), probs)))
+		# Get the product of all perms of ratings as a [(r_bar ^ q) x p] matrix
+		# i.e. get the P(R_u1 = r_1, ..., R_uq = r_q | G_u = g; \pi)'s, with g as column
+		cond_probs = np.array(list(map(partial(reduce, np.outer), probs))).reshape(self.g, -1).T
 
-		# sum over groups to get P(R_u1 = r_1, ..., R_uq = r_q; \pi)'s
-		prob_r = np.inner(self.group_probs, prob_r_g.T).T
+		# marginalise out groups to get P(R_u1 = r_1, ..., R_uq = r_q; \pi)'s
+		r_probs = cond_probs.dot(self.g_probs)
 
-		# elementwise divide prob_r_g for each group by prob_r
-		for g in self.groups: prob_r_g[g] /= prob_r
+		# Use Bayes' theorem to get P(G_u = g | R_u\pi = r)'s
+		cond_probs *= self.g_probs / r_probs[:,None]
 
-		# sum these to get group_probs after items rated
-		return self.group_probs * np.array([ps.sum() for ps in prob_r_g])
+		# Return the expected value of the utility over all ratings
+		return np.apply_along_axis(util_f, 0, cond_probs).T.dot(r_probs)
 
-def test():
-	np.random.seed(1)
+class TestUserGroupModel(unittest.TestCase):
 
-	group_count, item_count, rating_count = 2, 10, 2
-	dist_m = np.random.randint(8, size=(group_count, item_count, rating_count)).astype(np.float32) + 1
-	dist_m /= dist_m.sum(axis=2, keepdims=True) # normalise rating dists
+	def test_probs_sum_to_one_when_U_is_ident(self):
+		np.random.seed(1)
 
-	init_probs = np.arange(group_count, dtype=np.float32) + 1
-	init_probs /= init_probs.sum()
-	user_m = UserGroupModel(init_probs, dist_m)
+		group_count, item_count, rating_count = 8, 10, 5
+		dist_m = np.random.randint(8, size=(group_count, item_count, rating_count)).astype(np.float32) + 1
+		dist_m /= dist_m.sum(axis=2, keepdims=True) # normalise rating dists
 
-	items = [0]
-	la = user_m.lookahead(items)
-	print(la)
-	print(la.sum())
+		init_probs = np.arange(group_count, dtype=np.float32) + 1
+		init_probs /= init_probs.sum()
+		user_m = UserGroupModel(init_probs, dist_m)
+
+		items = [0, 2, 5]
+		U = lambda x: x
+		exp_u = user_m.expected_utility(items, U)
+		
+		self.assertAlmostEqual(exp_u.sum(), 1.0)
 	
 if __name__ == '__main__':
-	test()
+    unittest.main()
