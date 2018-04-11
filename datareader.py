@@ -30,6 +30,7 @@ class DataReader:
 	Utilde_file = data_dir + blc_data + '/Utilde'
 	lam_file = data_dir + blc_data + '/lam'
 	Rvar_file = data_dir + blc_data + '/Rvar'
+	P_file = data_dir + blc_data + '/P.npz' # P as scipy csr matrix
 	#########################
 
 
@@ -114,6 +115,12 @@ class DataReader:
 	def get_lam():
 		""" number of ratings for each item by each group """
 		return DataReader.read_numpy_file(DataReader.lam_file)
+
+	@lru_cache(maxsize=1)
+	def get_P():
+		filename = DataReader.P_file
+		with msg(f'Reading "{filename}"'):
+			return sp.load_npz(filename)
 
 	@lru_cache(maxsize=1)
 	def get_group_rating_distributions():
