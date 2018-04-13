@@ -23,7 +23,7 @@ class DataReader:
 
 	cache_dir = data_dir + "_cache/"
 	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
-	group_rating_dists_cache_file =  cache_dir + blc_data + '_group_rating_dists.npy'
+	group_rating_dists_cache_file =  cache_dir + blc_data + '_group_rating_dists{}.npy'
 
 	nyms_file = data_dir + blc_data + '/P'
 	V_file = data_dir + blc_data + '/V'
@@ -64,13 +64,20 @@ class DataReader:
 		with msg(f'Converting to list of user indexes by group'):
 			indexes = np.arange(P.shape[1])
 			return [indexes[group] for group in P.astype(bool)]
-	
+
+	@lru_cache(maxsize=1)
+	def nym_sizes():
+		return DataReader.get_P().sum(axis=1)
+
+	def number_of_users():
+		return DataReader.get_P().shape[1]
+
 	def nym_count():
 		return len(DataReader.get_nyms())
 
 	@lru_cache(maxsize=1)
 	def get_nym_stats():
-		""" Returns statistics about rating distributions of all items for each nym,
+		""" Returns statistics about rating distributions of all items for each nym
 		as a 3d numpy array [nym number, item number, <stat>] (type np.float32),
 		where <stat> index
 		  0 : item index
@@ -125,14 +132,14 @@ class DataReader:
 				return sp.load(filename + '.npy')
 
 	@lru_cache(maxsize=1)
-	def get_group_rating_distributions():
+	def get_group_rating_distributions(reg=10):
 		"""
 		Returns a [p, m, r] array containing distribution of ratings for each item by group
 		p = number of groups
 		m = number of items
 		r = rating
 		"""
-		cachefile = DataReader.group_rating_dists_cache_file
+		cachefile = DataReader.group_rating_dists_cache_file.format(f'_reg{reg}' if reg else '')
 		if os.path.isfile(cachefile):
 			with msg(f'Reading distribution of ratings for each item per group from "{cachefile}"'):
 				return np.load(cachefile)
@@ -145,12 +152,15 @@ class DataReader:
 			rating_count = DataReader.rating_value_count
 
 			dists = np.zeros((group_count, item_count, rating_count), dtype=np.float32)
-			for group_n, group in enumerate(P):
-				with msg(f'Calculating group {group_n} distributions'):
-					R_g = R[group].tocoo()
-					for item, rating in zip(R_g.col, R_g.data):
-						dists[group_n, item, int(rating - 1)] += 1
+			with msg(f'Calculating distributions'):
+				for group_n, group in enumerate(P):
+					for rating_index in range(rating_count):
+						rating = rating_index + 1
+						dists[group_n, :, rating_index] = (R[group] == rating).sum(axis=0)
 			
+			# Add small value to regularise low popularity items
+			if reg: dists += reg/rating_count
+
 			with msg('Normalising distributions'):
 				dists /= dists.sum(axis=2, keepdims=True)
 				# nan's imply 0 ratings by group on item, so give equal distribution 
