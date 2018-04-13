@@ -4,7 +4,10 @@ from timeit import default_timer
 nesting_level = 0
 newl = False
 @contextmanager
-def msg(message):
+def msg(message, enabled=True):
+	if enabled is False: 
+		yield
+		return
 	global nesting_level, newl
 
 	indent = '  '
