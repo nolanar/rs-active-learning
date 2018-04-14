@@ -24,6 +24,7 @@ class DataReader:
 	cache_dir = data_dir + "_cache/"
 	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
 	group_rating_dists_cache_file =  cache_dir + blc_data + '_group_rating_dists{}.npy'
+	group_ratings_cache_file =  cache_dir + blc_data + '_group_ratings.npy'
 
 	nyms_file = data_dir + blc_data + '/P'
 	V_file = data_dir + blc_data + '/V'
@@ -65,8 +66,11 @@ class DataReader:
 			indexes = np.arange(P.shape[1])
 			return [indexes[group] for group in P.astype(bool)]
 
-	@lru_cache(maxsize=1)
 	def nym_sizes():
+		return group_sizes()
+
+	@lru_cache(maxsize=1)
+	def group_sizes():
 		return DataReader.get_P().sum(axis=1)
 
 	def number_of_users():
@@ -74,6 +78,9 @@ class DataReader:
 
 	def nym_count():
 		return len(DataReader.get_nyms())
+
+	def nym_distribution():
+		return DataReader.nym_sizes() / DataReader.number_of_users()
 
 	@lru_cache(maxsize=1)
 	def get_nym_stats():
@@ -132,7 +139,7 @@ class DataReader:
 				return sp.load(filename + '.npy')
 
 	@lru_cache(maxsize=1)
-	def get_group_rating_distributions(reg=10):
+	def get_group_rating_distributions(reg=None):
 		"""
 		Returns a [p, m, r] array containing distribution of ratings for each item by group
 		p = number of groups
@@ -167,6 +174,38 @@ class DataReader:
 				dists[np.isnan(dists)] = 1.0 / rating_count
 
 			with msg(f'Saving distribution of ratings to "{cachefile}"'):
+				np.save(cachefile, dists)
+
+			return dists
+
+	@lru_cache(maxsize=1)
+	def get_group_ratings():
+		"""
+		Returns a [p, m, r] array containing distribution of ratings for each item by group
+		p = number of groups
+		m = number of items
+		r = rating
+		"""
+		cachefile = DataReader.group_ratings_cache_file
+		if os.path.isfile(cachefile):
+			with msg(f'Reading group ratings from "{cachefile}"'):
+				return np.load(cachefile)
+
+		with msg('Getting group ratings'):
+			R = DataReader.get_ratings()
+			P = DataReader.get_nyms()
+			group_count = DataReader.nym_count()
+			item_count = R.shape[1]
+			rating_count = DataReader.rating_value_count
+
+			dists = np.zeros((group_count, item_count, rating_count), dtype=np.float32)
+			with msg(f'Calculating rating counts'):
+				for group_n, group in enumerate(P):
+					for rating_index in range(rating_count):
+						rating = rating_index + 1
+						dists[group_n, :, rating_index] = (R[group] == rating).sum(axis=0)
+
+			with msg(f'Saving group ratings to "{cachefile}"'):
 				np.save(cachefile, dists)
 
 			return dists

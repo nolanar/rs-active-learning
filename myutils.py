@@ -4,7 +4,7 @@ from timeit import default_timer
 nesting_level = 0
 newl = False
 @contextmanager
-def msg(message, enabled=True):
+def msg(message, enabled=True, done=True):
 	if enabled is False: 
 		yield
 		return
@@ -12,7 +12,7 @@ def msg(message, enabled=True):
 
 	indent = '  '
 	nl = '\n' if newl else ''
-	output = f'{nl}{indent * nesting_level}{message} ... '
+	output = f'{nl}{indent * nesting_level}{message} {"..." if done else ""}'
 	print(output, end='', flush=True)
 	nesting_level += 1
 	newl = True
@@ -21,6 +21,8 @@ def msg(message, enabled=True):
 	yield
 	t1 = default_timer()
 	
-	print('{}done ({:.3f}s)'.format('' if newl else indent * (nesting_level), t1-t0))
+	if done: print('{}done ({:.3f}s)'.format('' if newl else indent * (nesting_level), t1-t0))
+	else: print()
 	nesting_level -= 1
 	newl = False
+
