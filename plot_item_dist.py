@@ -34,6 +34,7 @@ def barplot_rating_dist(item, single=False, group=None, savefig=None):
 			plt.title(f'Item {item}, all groups rating distributions')
 			for nym_n, nym in enumerate(nyms):
 				hist(ratings[nym].data, histtype='step', linewidth=2 ,label=f'group {nym_n}')
+				# sns.kdeplot(ratings[nym].data, bw=1)
 			plt.legend()
 		if savefig is None:
 			plt.show()

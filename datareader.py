@@ -2,10 +2,9 @@ import numpy as np
 import scipy.sparse as sp
 import os.path
 import pathlib
+from functools import lru_cache # cache large I/O result
 
 from myutils import msg
-
-from functools import lru_cache # cache large I/O result
 
 class DataReader:
 	""" Utility class for getting rating and nym data """
@@ -25,6 +24,10 @@ class DataReader:
 	nym_stats_cache_file = cache_dir + blc_data + '_nym_stats_v2.npy'
 	group_rating_dists_cache_file =  cache_dir + blc_data + '_group_rating_dists{}.npy'
 	group_ratings_cache_file =  cache_dir + blc_data + '_group_ratings.npy'
+	
+	error_param_file = cache_dir + blc_data + '_error_params.npy'
+	adjusted_dist_cache_file =  cache_dir + blc_data + '_adjusted_dist.npy'
+
 
 	nyms_file = data_dir + blc_data + '/P'
 	V_file = data_dir + blc_data + '/V'
@@ -198,14 +201,14 @@ class DataReader:
 			item_count = R.shape[1]
 			rating_count = DataReader.rating_value_count
 
-			dists = np.zeros((group_count, item_count, rating_count), dtype=np.float32)
+			ratings = np.zeros((group_count, item_count, rating_count), dtype=np.float32)
 			with msg(f'Calculating rating counts'):
 				for group_n, group in enumerate(P):
 					for rating_index in range(rating_count):
 						rating = rating_index + 1
-						dists[group_n, :, rating_index] = (R[group] == rating).sum(axis=0)
+						ratings[group_n, :, rating_index] = (R[group] == rating).sum(axis=0)
 
 			with msg(f'Saving group ratings to "{cachefile}"'):
-				np.save(cachefile, dists)
+				np.save(cachefile, ratings)
 
-			return dists
+			return ratings

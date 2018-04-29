@@ -2,17 +2,18 @@ import numpy as np
 from datareader import DataReader
 from myutils import msg
 
-def synthesise_user_data(dists, n, group_ratios, rating_value_count):
+def synthesise_user_data(dists, n, group_ratios, rating_value_count, permute=True):
 	"""
 	Synthesise n users, using the given distribution of ratings.
-	Ratings are from 0 to rating_value_count
+	NOTE: Ratings are from 0 to rating_value_count - 1
 	returns 2D ratings array, and groups list corresponding to which group each user belongs to.
 	"""
 	# distribute number of users to be generated over groups
 	group_ratios = group_ratios / group_ratios.sum()
-	group_sizes = (group_ratios / group_ratios.sum() * n).astype(int)
+	group_sizes = (group_ratios * n).astype(int)
 	remainder = n - group_sizes.sum()
-	group_sizes[np.argpartition(group_ratios, -remainder)[-remainder:]] +=1
+	if remainder > 0:
+		group_sizes[np.argpartition(group_ratios, -remainder)[-remainder:]] +=1
 
 	ratings = []
 	for group_size, group in zip(group_sizes, dists):
@@ -23,8 +24,10 @@ def synthesise_user_data(dists, n, group_ratios, rating_value_count):
 
 	groups = np.concatenate([np.full(group_size, group) for group, group_size in enumerate(group_sizes)])
 
-	perm = np.random.permutation(ratings.shape[0])
-	return ratings[perm], groups[perm]
+	if permute: 
+		perm = np.random.permutation(ratings.shape[0])
+		return ratings[perm], groups[perm]
+	else: return ratings, groups
 
 def demo_synthesise_user_data():
 	np.random.seed(0)

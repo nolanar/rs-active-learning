@@ -61,7 +61,7 @@ def plot_sliding_var(option='var'):
 	plt.legend()
 	plt.show()
 
-def get_mesh(option='var'):
+def get_mesh(option='mean'):
 	a, b = 1, 5
 	padding = 10
 	x_points = 256
@@ -83,18 +83,23 @@ def get_mesh(option='var'):
 
 	# grid_z = griddata(points, t_v, (grid_x, grid_y), method='cubic')
 	# grid_z = griddata(np.column_stack((t_x, points[:,1])), t_v, (grid_x, grid_y), method='linear')
-	col = 1 if option is 'var' else 0
+	col = 1 if option is 'variance' else 0
 	grid_z = griddata(np.column_stack((t_x, t_v)), points[:,col], (grid_x, grid_y), method='linear')
+	print(grid_z)
+	
 
-	for i in range(10, 256, 10):
-		x = np.linspace(1, 5, num=256)
-		y = grid_z[i]
-		x = x[~np.isnan(y)]
-		y = y[~np.isnan(y)]
-		
-		plt.title(f'var {grid_y[i, 0]}')
-		plt.plot(x, y)		
-		plt.show()
+	# for i in range(10, 256, 10):
+	i = 90
+	x = np.linspace(1, 5, num=256)
+	y = grid_z[i]
+	x = x[~np.isnan(y)]
+	y = y[~np.isnan(y)]
+	
+	plt.title(f'Calculated variance = {grid_y[i, 0]}')
+	plt.xlabel('calculated mean')
+	plt.ylabel(f'corrected {option}')
+	plt.plot(x, y)
+	plt.show()
 
 
 	fig = plt.figure()
@@ -103,6 +108,7 @@ def get_mesh(option='var'):
 
 	plt.show()
 
+get_mesh()
 
 ################ EXPERIMENTAL ###################
 

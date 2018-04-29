@@ -21,7 +21,7 @@ def msg(message, enabled=True, done=True):
 	yield
 	t1 = default_timer()
 	
-	if done: print('{}done ({:.3f}s)'.format('' if newl else indent * (nesting_level), t1-t0))
+	if done: print('{}done ({:.3f}s)'.format(' ' if newl else indent * (nesting_level), t1-t0))
 	else: print()
 	nesting_level -= 1
 	newl = False

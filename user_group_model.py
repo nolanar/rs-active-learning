@@ -15,7 +15,8 @@ class UserGroupModel:
 
 		# get the P(R_u1 = r_1, ..., R_uq = r_q | G_u = g; \pi)'s as the product 
 		# of P(R_ui = r_i | G_u = g; \pi)'s, for all permutations of ratings
-		if len(items) > 1: cond_probs = np.array(list(map(partial(reduce, np.outer), cond_probs)))
+		if items.shape[0] > 1:
+			cond_probs = np.array(list(map(partial(reduce, np.multiply.outer), cond_probs)))
 
 		# flatten the item and ratings dimensions
 		cond_probs = cond_probs.reshape(self.g, -1).T
