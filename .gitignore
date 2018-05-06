@@ -4,7 +4,10 @@ data/netflix_orig_movie_ids.npy
 data/netflix_orig_user_ids.npy
 data/netflix_ratings.npz
 
-data/_cache
+data/_cache/
+data/next-best/
+data/sampling/
+data/testing/
 
 # figures directory
 figures/
