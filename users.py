@@ -37,7 +37,7 @@ def synthesise_user_data(dists, n, group_ratios, rating_value_count, permute=Tru
 
 def gen_test_data(user_groups=None, item_n=100, subdir=''):
     """ Generate presistent data for testing """
-    items = GroupRatings(correct_error=False)
+    items = GroupRatings()
     item_count = items.item_count()
 
     user_n = user_groups.shape[0]
@@ -85,7 +85,7 @@ class Users:
         test_means        : the ratings predicted for that users group
         """
         if group is not None: 
-            subdir = f'group{group}/'
+            subdir = f'group{group}_'
             group_ratios = np.zeros(training.n_groups)
             group_ratios[group] = 1
         else: 

@@ -1,6 +1,8 @@
 import numpy as np
 import random
 from functools import lru_cache
+from myutils import *
+
 
 class GroupRatings:
     """
@@ -55,7 +57,7 @@ class GroupRatings:
         """ normalised distribution of ratings by each group. [p x m x r] array """
         dist = self.get_ratings()
         sum_ratings = dist.sum(axis=2, keepdims=True)
-        suppress_numpy_err(): # suppress warning about nan values
+        with suppress_numpy_err(): # suppress warning about nan values
             dist = dist / sum_ratings # normalise
         dist[np.isnan(dist)] = 1 / dist.shape[0] # if a group has no ratings for an item, give it a uniform distribution
         return dist

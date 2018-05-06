@@ -9,11 +9,11 @@ from group_ratings import GroupRatings
 default_n_points = 26
 
 def accuracy_save_file(label, n_points):
-    return f'data/plots/{label.replace(" ", "-")}-accuracy-{n_points}.npy'
+    return f'data/sampling/{label.replace(" ", "-")}-accuracy-{n_points}.npy'
 
 def rmse_save_file(label, n_points, hard_memb=False):
     hard = '-hard' if hard_memb else ''
-    return f'data/plots/{label.replace(" ", "-")}-rmse-{n_points}{hard}.npy'
+    return f'data/sampling/{label.replace(" ", "-")}-rmse-{n_points}{hard}.npy'
 
 def get_posteriors(group_ratings_dist, user_ratings, samples, priors):
     """
@@ -56,9 +56,9 @@ def save_fig(f, label, tag=None):
     else: tag = f'-{tag}'
     plot_name = f"{label.replace(' ', '-')}{tag}.png"
     fname = f + plot_name
-    print("saving",fname)
-    plt.savefig(fname, bbox_inches='tight')
-    plt.clf()
+    with msg("saving",fname):
+        plt.savefig(fname, bbox_inches='tight')
+        plt.clf()
 
 def plot_rmse(min_rmses, true_rmse, label, baseline=None, savefig=False, hard_memb=False):
     plt.grid(True)
@@ -127,7 +127,7 @@ def run(label=None, user_n=500, sample_n=500, n_points=default_n_points, correct
         with_accuracy=True, save_points=True, baseline=True, weight=False, plot_spread=False, plot=True, hard_memb=False):
 
     # pick item pool
-    with msg('\nConfiguring item pool'):
+    with msg('Configuring item pool'):
         g = GroupRatings()
         g.thresh(thresh)
 
@@ -187,13 +187,28 @@ def run(label=None, user_n=500, sample_n=500, n_points=default_n_points, correct
                         min_rmses_hard[point] = np.min(rmses_hard)
 
     if save_points:
-        print('saving', accuracy_save_file(label, n_points))
-        if with_accuracy: np.save(accuracy_save_file(label, n_points), max_accuracies)
-        print('saving', rmse_save_file(label, n_points))
-        if with_rmse: np.save(rmse_save_file(label, n_points), min_rmses)
-        if hard_memb:
-            print('saving', rmse_save_file(label, n_points, hard_memb=True))
-            if with_rmse: np.save(rmse_save_file(label, n_points, hard_memb=True), min_rmses_hard)
+        if label == 'sampling by pop':
+            plabel = 'passive'
+            if with_accuracy: 
+                with msg('saving', accuracy_save_file(plabel, n_points)):
+                    np.save(accuracy_save_file(plabel, n_points), median_accuracies)
+            if with_rmse: 
+                with msg('saving', rmse_save_file(plabel, n_points)):
+                    np.save(rmse_save_file(plabel, n_points), median_rmses)
+            if hard_memb and with_rmse:
+                    with msg('saving', rmse_save_file(plabel, n_points, hard_memb=True)):
+                        np.save(rmse_save_file(plabel, n_points, hard_memb=True), median_rmses_hard)
+        else:
+            if with_accuracy: 
+                with msg('saving', accuracy_save_file(label, n_points)):
+                    np.save(accuracy_save_file(label, n_points), max_accuracies)
+            if with_rmse: 
+                with msg('saving', rmse_save_file(label, n_points)):
+                    np.save(rmse_save_file(label, n_points), min_rmses)
+            if hard_memb and with_rmse: 
+                with msg('saving', rmse_save_file(label, n_points, hard_memb=True)):
+                    np.save(rmse_save_file(label, n_points, hard_memb=True), min_rmses_hard)
+
 
     if plot_spread:
         if with_accuracy: plot_accuracy_spread(min_accuracies, median_accuracies, max_accuracies, label)
@@ -230,7 +245,9 @@ def plot_all(n_points=default_n_points, option='accuracy', savefig=False):
     plt.plot(xs, passive_ys, label='passive', ls='--', color='black')
 
     if option == 'rmse':
-        users = Users(training=GroupRatings(), user_n=500)
+        g = GroupRatings(output=False)
+        g.keep_n(1)
+        users = Users(training=g, user_n=500)
         plt.axhline(users.test_data_rmse(),  c='b', ls='-.', label=f'target RMSE')
     
     plt.legend()
@@ -238,6 +255,9 @@ def plot_all(n_points=default_n_points, option='accuracy', savefig=False):
     else: plt.show()
 
 if __name__ == '__main__':
-    for label in labels: run(label=label)
-    plot_all(option='accuracy')
+    # for label in labels:
+    #     with msg(f"Running sampling method for '{label}' heuristic"):
+    #         run(label=label, plot=False)
+
+    # plot_all(option='accuracy')
     plot_all(option='rmse')

@@ -5,7 +5,7 @@ pip install -r requirements.txt
 
 # create required empty directories
 mkdir -p "figures/"
-mkdir -p "data/dir_cache/"
+mkdir -p "data/_cache/"
 mkdir -p "data/sampling/"
 mkdir -p "data/next-best/"
 mkdir -p "data/testing/"

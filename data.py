@@ -47,7 +47,7 @@ def get_R():
 	Stores csc matrix to ratings_cache_file for faster loading in future.
 	Cached result to allow single load on multiple calls. 
 	"""
-	filename = DataReader.ratings_file
+	filename = ratings_file
 	if os.path.isfile(filename):
 		with msg(f'Loading rating matrix from "{filename}"'):
 			return sp.load_npz(filename)
@@ -59,42 +59,42 @@ def get_groups():
 	""" Returns the groups as a list of numpy arrays.
 	Cached result to allow single load on multiple calls.
 	"""
-	P = DataReader.get_P()
+	P = get_P()
 	with msg(f'Converting to list of user indexes by group'):
 		indexes = np.arange(P.shape[1])
 		return [indexes[group] for group in P.astype(bool)]
 
 @lru_cache(maxsize=1)
 def group_sizes():
-	return DataReader.get_P().sum(axis=1)
+	return get_P().sum(axis=1)
 
 def number_of_users():
-	return DataReader.get_P().shape[1]
+	return get_P().shape[1]
 
 def number_of_groups():
-	return DataReader.get_P().shape[0]
+	return get_P().shape[0]
 
 def group_distribution():
-	return DataReader.group_sizes() / DataReader.number_of_users()
+	return group_sizes() / number_of_users()
 
 @lru_cache(maxsize=1)
 def get_Rtilde():
-	V = DataReader.read_numpy_file(DataReader.V_file)
-	Utilde = DataReader.read_numpy_file(DataReader.Utilde_file)
+	V = read_numpy_file(V_file)
+	Utilde = read_numpy_file(Utilde_file)
 	return np.dot(Utilde.T, V)
 
 @lru_cache(maxsize=1)
 def get_Rvar():
-	return DataReader.read_numpy_file(DataReader.Rvar_file)
+	return read_numpy_file(Rvar_file)
 
 @lru_cache(maxsize=1)
 def get_lam():
 	""" number of ratings for each item by each group """
-	return DataReader.read_numpy_file(DataReader.lam_file)
+	return read_numpy_file(lam_file)
 
 @lru_cache(maxsize=1)
 def get_P():
-	filename = DataReader.P_file
+	filename = P_file
 	if os.path.isfile(filename + '.npz'):
 		with msg(f'Reading "{filename}.npz"'):
 			return sp.load_npz(filename + '.npz').toarray()
@@ -110,19 +110,18 @@ def get_group_ratings():
 	m = number of items
 	r = number of rating values
 	"""
-	cachefile = DataReader.group_ratings_cache_file
+	cachefile = group_ratings_cache_file
 	if os.path.isfile(cachefile):
 		with msg(f'Reading group ratings from "{cachefile}"'):
 			return np.load(cachefile)
 
 	with msg('Getting group ratings'):
-		R = DataReader.get_R()
-		P = DataReader.get_groups()
-		number_of_groups = DataReader.number_of_groups()
+		R = get_R()
+		P = get_groups()
 		item_count = R.shape[1]
-		rating_count = DataReader.rating_value_count
+		rating_count = rating_value_count
 
-		ratings = np.zeros((number_of_groups, item_count, rating_count), dtype=np.float32)
+		ratings = np.zeros((number_of_groups(), item_count, rating_count), dtype=np.float32)
 		with msg(f'Calculating rating counts'):
 			for group_n, group in enumerate(P):
 				for rating_index in range(rating_count):
