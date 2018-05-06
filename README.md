@@ -18,6 +18,9 @@ Run the "sampling" active learning method.
 ### `next_best_method.py`
 Simulate the "next-best" active learning method on synthesised test users.
 
+### `users.py`
+Class and utils for generating test user data.
+
 ### `group_ratings.py`
 GroupRatings class with useful methods for group ratings on items. Provides item filtering, rating distributions, rating statistics, item sampling.
 
