@@ -12,5 +12,8 @@ Accelerating Learning for Recommender Systems via Group Learning
 
 ## Scripts
 
+### `group_ratings.py`
+GroupRatings class with useful methods for group ratings on items. Provides item filtering, rating distributions, rating statistics, item sampling.
+
 ### `data.py`
-Utilities for getting rating and group data.
+Utilities for reading rating and group data. Used by `group_ratings.py`.
