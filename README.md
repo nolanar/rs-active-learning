@@ -12,6 +12,9 @@ Accelerating Learning for Recommender Systems via Group Learning
 
 ## Scripts
 
+### `sampling_method.py`
+Run the "sampling" active learning method.
+
 ### `next_best_method.py`
 Simulate the "next-best" active learning method on synthesised test users.
 
