@@ -12,6 +12,9 @@ Accelerating Learning for Recommender Systems via Group Learning
 
 ## Scripts
 
+### `next_best_method.py`
+Simulate the "next-best" active learning method on synthesised test users.
+
 ### `group_ratings.py`
 GroupRatings class with useful methods for group ratings on items. Provides item filtering, rating distributions, rating statistics, item sampling.
 
