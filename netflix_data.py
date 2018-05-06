@@ -2,15 +2,22 @@ import numpy as np
 import scipy.sparse as sp
 from zipfile import ZipFile
 from io import TextIOWrapper
-
 from myutils import msg
 
+##
+# NOTE ON USE:
+# Download the Netflix Prize data zip file from 
+# https://www.kaggle.com/netflix-inc/netflix-prize-dat
+# then put the zip file into the `data/` directory.
+##
+
 data_dir = 'data/'
+netflix_data = data_dir + 'netflix-prize-data.zip'
+
 ratings_file = data_dir + 'netflix_ratings.npz'
 users_file = data_dir + 'netflix_orig_user_ids.npy'
 movies_file = data_dir + 'netflix_orig_movie_ids.npy'
 
-netflix_data = data_dir + 'netflix-prize-data.zip'
 
 def parse_ratings(zipfile=netflix_data):
 	filecount = 4
@@ -58,6 +65,5 @@ def save_data(ratings, user_ids, movie_ids):
 
 if __name__ == '__main__':
 	ratings = parse_ratings()	
-
 	ratings, user_ids, movie_ids = prepare_ratings(ratings)
 	save_data(ratings, user_ids, movie_ids)

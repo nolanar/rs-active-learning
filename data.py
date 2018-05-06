@@ -116,7 +116,7 @@ def get_group_ratings():
 			return np.load(cachefile)
 
 	with msg('Getting group ratings'):
-		R = DataReader.get_ratings()
+		R = DataReader.get_R()
 		P = DataReader.get_groups()
 		number_of_groups = DataReader.number_of_groups()
 		item_count = R.shape[1]
